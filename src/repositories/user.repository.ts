@@ -21,10 +21,8 @@ class UserRepository {
     `;
 
     const values = [uuid];
-
     const { rows } = await db.query<User>(query, values);
     const [ user ] = rows;
-    
     return user;
   }
 
@@ -38,11 +36,33 @@ class UserRepository {
       RETURNING uuid
     `;
 
-
     const values = [user.username, user.password];
     const { rows } = await db.query<{ uuid: string }>(script, values);
     const [ newUser ] = rows;
     return newUser.uuid;
+  }
+
+  async update(user: User): Promise<void> {
+    const script = `
+      UPDATE application_user
+      SET
+        username = $1,
+        password = crypt($2, 'my_salt')
+      WHERE uuid = S3
+    `;
+
+    const values = [user.username, user.password, user.uuid];
+    await db.query(script, values);
+  }
+
+  async remove(uuid: string): Promise<void> {
+    const script = `
+      DELETE
+      FROM application_user
+      WHERE uuid = $1
+    `;
+    const values = [uuid];
+    await db.query(script, values);
   }
 
 }
