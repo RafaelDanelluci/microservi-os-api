@@ -1,4 +1,5 @@
 import Express from 'express';
+import bearerAuthenticationMiddleware from './middlewares/bearer-authentication.middleware';
 import errorHandler from './middlewares/error-handler.middlewares';
 import authorizationRouter from './routes/authorization.route';
 import statusRoute from './routes/status.router';
@@ -12,7 +13,7 @@ app.use(Express.urlencoded({ extended: true }));
 
 //config de rotas
 app.use(statusRoute);
-app.use(usersRoute);
+app.use(bearerAuthenticationMiddleware, usersRoute);
 app.use(authorizationRouter);
 
 //config dos Handlers de erro
